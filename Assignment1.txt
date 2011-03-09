@@ -1,0 +1,108 @@
+1.	Find the names of parts for which there is no supplier.
+select id from parts
+EXCEPT
+select distinct pid from catalog
+
+2.	Find the names of suppliers who supply every part.
+SELECT S.sname
+FROM Suppliers S
+WHERE NOT EXISTS ((
+ SELECT P.id
+ FROM Parts P)
+ EXCEPT
+ (SELECT C.pid
+  FROM Catalog C
+  WHERE C.sid=S.id));
+
+3.	Find the names of suppliers who supply every red part.
+create view temp
+as
+
+select   * 
+from catalog join parts
+on catalog.pid = parts.id
+where parts.color='red'
+
+select distinct sname
+from suppliers join temp
+on suppliers.id = temp.sid
+
+4.	Find the names of parts supplied by Acme Widget Suppliers and no one else.
+SELECT P.pname
+FROM Parts P, Catalog C, Suppliers S
+WHERE P.id = C.pid and C.sid=S.id
+AND S.sname = 'Acme Widget Suppliers'
+AND NOT EXISTS
+ (SELECT * FROM Catalog C1, Suppliers S1
+ WHERE P.id=C1.pid AND C1.sid=S1.id AND S1.sname<>'Acme Widget Suppliers');
+
+5. Find the IDs of suppliers who charge more for some part then the average cost of that part (average over all suppliers who supply that part).
+SELECT DISTINCT c.sid
+FROM Catalog C
+WHERE C.cost > (select avg(C1.cost)
+      FROM Catalog C1
+      WHERE C1.pid=C.pid);
+
+6. For each part, find the name of the supplier who charges the most for that part.
+SELECT P.id, S.sname
+FROM Parts P, Suppliers S, Catalog C
+WHERE C.pid = P.id AND C.sid=S.id AND C.cost =
+ (SELECT MAX(C1.cost)
+ FROM Catalog C1
+ WHERE C1.pid=P.id);
+
+7. Find the IDs of suppliers who do not sell any non-red parts.
+SELECT DISTINCT sid 
+FROM Catalog c, Parts p
+WHERE c.pid=p.id AND p.color LIKE 'Red%' AND sid NOT IN (
+   SELECT sid 
+   FROM Catalog c1, parts p1 
+   WHERE p1.color NOT LIKE 'Red%' AND p1.id = c1.pid);
+
+8. Find the IDs of suppliers who sell a red part and a green part.
+SELECT DISTINCT C.sid
+ FROM Catalog C, Parts P
+ WHERE C.pid = P.id AND P.color like 'Red%'
+INTERSECT
+ SELECT DISTINCT C1.sid
+ FROM Catalog C1, Parts P1
+ WHERE C1.pid=P1.id AND P1.color like 'Green%';
+
+9. Find the IDs of suppliers who sell a red part or a green part.
+SELECT Distinct C.sid
+ FROM Catalog C, Parts P
+ WHERE C.pid=P.id AND P.color like 'Red%'
+UNION
+ SELECT Distinct C1.sid
+ FROM Catalog C1, Parts P1
+ WHERE C1.pid=P1.id AND P1.color like 'Green%';
+
+
+
+10. For every supplier that only supplies green parts, print the name of the supplier and the total number of parts that she supplies.
+SELECT S.sname, COUNT(*) as PartCount
+FROM Suppliers S, Catalog C, Parts P
+WHERE C.sid = S.id and P.id = C.pid and P.color = 'GREEN'
+GROUP BY S.sname, S.id
+
+
+11. For every supplier that supplies a green part and a red part, print both the name and price of the most expensive part that she supplies and the name and price of the least expensive part that she supplies.
+
+create view temp2
+as
+
+SELECT DISTINCT C.sid
+ FROM Catalog C, Parts P
+ WHERE C.pid = P.id AND P.color like 'Red%'
+INTERSECT
+ SELECT DISTINCT C1.sid
+ FROM Catalog C1, Parts P1
+ WHERE C1.pid=P1.id AND P1.color like 'Green%';
+
+
+
+
+SELECT s.sname,Max(c.cost),Min(c.cost)
+from temp2,catalog c,suppliers s
+where temp2.sid=c.sid and c.sid=s.id
+GROUP BY S.sname, S.id
