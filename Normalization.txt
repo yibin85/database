@@ -1,0 +1,46 @@
+Normalization Assignment 
+1. No
+Order(Order#,customer#,order_date,total_amount)
+Order_line(Order#,item#,order_quanitity)
+Order_item(Item#,Price_each, discount%)
+
+2. No
+
+Rx(Treatment_code,Charge,Date)
+Treatment(Treatment_code, Patient#, Doctor#, Diagnosis)
+
+3.
+  (1) A,B are the primary keys of R
+
+    2NF:(A,B,C)
+        (A,D,I,J,E)
+        (B,F,G,H)
+    
+    3NF: (A,B,C)
+         (A,D,E)
+         (D,I,J)
+         (B,F)
+         (F,G,H)
+
+(2) A,B,D are the primary keys of R
+  
+    2NF:(A,B,C)
+        (A,I,D,G,H,J)
+        (B,D,E,F)
+
+    3NF:(A,B,C)
+        (A,D,G,H)
+        (H,J)
+        (A,I)
+        (B,D,E,F)
+    
+4.	
+    a. (manufacturer, serial number) ¡údrive 
+    b. model number¡ú (manufacturer)
+    c. batch¡ú (model)	
+    d.(model manufacturer) ¡úcapacity
+
+    3NF:
+        DISK_DRIVE(Serial_number, Batch , Retailer)
+        Drive1(Serial_number, Manufacturer, Model, Capacity)
+
