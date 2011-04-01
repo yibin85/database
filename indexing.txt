@@ -1,0 +1,90 @@
+1.
+
+(a) Record length R = (30 + 9 + 9 + 40 + 9 + 8 + 1 + 4 + 4) + 1 = 115 bytes
+
+(b) Blocking factor bfr = floor(B/R) = floor(512/115) = 4 records per block
+    Number of blocks needed for file = ceiling(r/bfr) = ceiling(30000/4) = 7500
+
+(c) i. Index record size Ri=(V SSN + P) = (9 + 6)= 15 bytes
+       Index blocking factor bfr i = fo = floor(B/R i ) = floor(512/15) = 34
+    ii. Number of first-level index entries r1 = number of file blocks b = 7500 entries
+        Number of first-level index blocks b1 = ceiling(r1 /bfr i ) = ceiling(7500/34)= 221 blocks
+    iii.Number of second-level index entries r2 = number of first-level blocks b1= 221 entries
+        Number of second-level index blocks b2 = ceiling(r2 /bfr i ) = ceiling(221/34)= 7 blocks
+        Number of third-level index entries r2 = number of second-level index blocks b2= 7 entries
+        Number of third-level index blocks b3 = ceiling(r3 /bfr i ) = ceiling(7/34) = 1
+    Since the third level has only one block, it is the top index level.
+    Hence, the index has x = 3 levels
+   iv. Total number of blocks for the index bi = b 1 + b 2 + b 3 = 221 + 7 + 1= 229 blocks
+   v. Number of block accesses to search for a record = x + 1 = 3 + 1 = 4
+
+(d) i. Index record size Ri = (V SSN + P) = (9 + 6) = 15 bytes
+       Index blocking factor bfr i = (fan-out) fo = floor(B/Ri ) = floor(512/15)= 34 index records per block
+    ii. Number of first-level index entries r1 = number of file records r = 30000
+        Number of first-level index blocks b1 = ceiling(r1 /bfr i ) = ceiling(30000/34)= 883 blocks
+    iii. We can calculate the number of levels as follows:
+         Number of second-level index entries r2 = number of first-level index blocks b1= 883 entries
+         Number of second-level index blocks b2 = ceiling(r2 /bfr i ) = ceiling(883/34)= 26 blocks
+         Number of third-level index entries r3 = number of second-level index blocks b2= 26 entries
+         Number of third-level index blocks b3 = ceiling(r3 /bfr i ) = ceiling(26/34) = 1
+    Since the third level has only one block, it is the top index level.
+    Hence, the index has x = 3 levels
+
+(e) i. Index record size Ri = (V DEPARTMENTCODE + P) = (9 + 6) = 15 bytes
+       Index blocking factor bfr i = (fan-out) fo = floor(B/Ri ) = floor(512/15)= 34 index records per block
+    ii. There are 1000 distinct values of DEPARTMENTCODE, so the average number of records for each value is (r/1000) = (30000/1000) = 30
+        Since a record pointer size PR = 7 bytes, the number of bytes needed at the level of indirection for each value of DEPARTMENTCODE is 7 * 30 =210         bytes, which fits in one block. Hence, 1000 blocks are needed for the level of indirection.
+    iii. Number of first-level index entries r1 = number of distinct values of DEPARTMENTCODE = 1000 entries
+         Number of first-level index blocks b1 = ceiling(r1 /bfr i ) = ceiling(1000/34)= 30 blocks
+    iv.Number of second-level index entries r2 = number of first-level index blocks b 1= 30 entries
+       Number of second-level index blocks b2 = ceiling(r2 /bfr i ) = ceiling(30/34) = 1
+    Hence, the index has x = 2 levels
+    v. total number of blocks for the index bi = b1 + b 2 + b indirection = 30 + 1 + 1000 = 1031 blocks
+    vi. Number of block accesses to search for and retrieve the block containing the record pointers at the level of indirection = x + 1 = 2 + 1 = 3         block accesses
+
+(f) i. Index record size Ri = (V DEPARTMENTCODE + P) = (9 + 6) = 15 bytes
+       Index blocking factor bfr i = (fan-out) fo = floor(B/Ri ) = floor(512/15)= 34 index records per block
+    ii. Number of first-level index entries r1= number of distinct DEPARTMENTCODE values= 1000 entries
+        Number of first-level index blocks b1 = ceiling(r1 /bfr i )= ceiling(1000/34) = 30 blocks
+    iii.Number of second-level index entries r2 = number of first-level index blocks b 1= 30 entries
+        Number of second-level index blocks b2 = ceiling(r2 /bfr i ) = ceiling(30/34) = 1
+    Since the second level has one block, it is the top index level.
+    Hence, the index has x = 2 levels
+    iv. Total number of blocks for the index bi = b 1 + b 2 = 30 + 1 = 31 blocks
+    v. Number of block accesses to search for the first block in the cluster of blocks= x + 1 = 2 + 1 = 3
+       The 30 records are clustered in ceiling(30/bfr) = ceiling(30/4) = 8 blocks.
+       Hence, total block accesses needed on average to retrieve all the records with a given
+       DEPARTMENTCODE = x + 8 = 2 + 8 = 10 block accesses
+
+(g) i. For a B + -tree of order p, the following inequality must be satisfied for each internal tree node: (p * P) + ((p - 1) * V SSN ) < B, or (p * 6) + ((p        - 1) * 9) < 512, which gives 15p < 521, so p=34 For leaf nodes, assuming that record pointers are included in the leaf nodes, the following inequality        must be satisfied: (p leaf * (V SSN +P R )) + P < B, or (p leaf * (9+7)) + 6 < 512, which gives 16p leaf < 506, so p leaf =31
+    ii. Assuming that nodes are 69% full on the average, the average number of key values in a leaf node is 0.69*p leaf = 0.69*31 = 21.39. If we round this         up for convenience, we get 22 key values (and 22 record pointers) per leaf node. Since the file has 30000 records and hence 30000 values of SSN, the         number of leaf-level nodes (blocks) needed is b 1 = ceiling(30000/22) = 1364 blocks
+    iii.The average fan-out for the internal nodes (rounded up for convenience) is fo = ceiling(0.69*p) = ceiling(0.69*34) = ceiling(23.46) = 24 number of            second-level tree blocks b 2 = ceiling(b 1 /fo) = ceiling(1364/24) = 57 blocks number of third-level tree blocks b 3 = ceiling(b 2 /fo) = ceiling             (57/24)= 3 number of fourth-level tree blocks b 4 = ceiling(b 3 /fo) = ceiling(3/24) = 1 Since the fourth level has only one block, the tree has x =4         levels (counting the leaf level). 
+    iv. total number of blocks for the tree bi = b 1 + b 2 + b 3 + b 4 = 1364 + 57 + 3 + 1 = 1425 blocks
+    v. number of block accesses to search for a record = x + 1 = 4 + 1 = 5
+
+2.
+
+a.p<address of top level block of index
+  for j<t step -1to 1
+      begin
+      read index block at j level;
+      search block p for entry i, Kj(i)<=Kj(i+1);
+      p<-Pj(i)
+      end;
+   Get all records which equal to searched value,read data from file       record which corresponding to address in list.
+b.p<address of top level block of index
+  for j<t step -1to 1
+      begin
+      read index block at j level;
+      search block p for entry i, Kj(i)<=Kj(i+1);
+      p<-Pj(i)
+      end;
+  Read data file corresponding to the address specified by record   pointer of files
+c.Assume the index is sequenced (x1,x2,x3,...)
+  for j<t step -1to 1
+      begin
+      read index block at j level;
+      search block p for entry i,(x1,x2,x3,...)j(i)<=(x1,x2,x3,...)j(i      +1)
+      p<-Pj(i)
+      end;
+  Read the p block files, search block p for record value of (x1,x2,x3,...)field.
